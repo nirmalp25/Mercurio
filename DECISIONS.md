@@ -50,3 +50,9 @@
 3. Admin UX: search and filter in the top-rated manager; enquiry detail view and a reply action.
 4. Production Docker images (multi-stage, php-fpm + nginx, a static frontend build) and IaC for ECS + RDS.
 5. Observability: structured logs and health checks for upstream sync failures.
+
+## Known issues at submission
+- **Playwright suite: committed, but not green yet.**
+  - The first run hit a *different* local app on `:5173` (a port clash on the dev machine). After moving to `WEB_PORT=5174`, several specs still fail and were not triaged before the deadline.
+  - Backend (49 Pest) and frontend (21 Jest) suites pass.
+  - Run against a custom port with `E2E_BASE_URL=http://localhost:<WEB_PORT> npx playwright test`.

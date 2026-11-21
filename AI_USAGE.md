@@ -14,7 +14,7 @@
 2. **Developer spec prompt.** I set the stack, the modular monolith, the JSON config-driven plug-and-play UI, the backend-owned Fake Store sync into a `products` table, the email factory with a null default plus an admin Queries page, the category modal, and debounced autocomplete. This shaped the whole architecture.
 3. **Clarifying questions in plan mode.** These settled Sanctum with a seeded admin, the null notifier with Mailpit ready, and Pest. **I overrode the AI's suggestion** of SQLite for tests in favour of Postgres everywhere.
 4. **"Continue with multiple agents."** Work was split by file ownership so agents never edited the same files.
-5. **Learning-mode handover.** The top-rated cap rule was deliberately left as a `TODO(human)`. The tests were written first to specify it, including always allowing un-featuring and treating re-featuring as a no-op.
+5. **Learning-mode handover.** The top-rated cap rule was deliberately left as a `TODO(human)`. The tests were written first to specify it, including always allowing un-featuring and treating re-featuring as a no-op. Because of the deadline, the AI then implemented it (only the "off to on" transition is checked, with a row lock against concurrent admins). The developer reviewed it afterwards.
 
 ## Where the AI got things wrong, and how it was caught
 - **Tests wiped the dev database.** phpunit `<env force>` doesn't override env vars Docker has already set, so `RefreshDatabase` ran on `mercuriodb`. A sub-agent noticed the dev data had vanished. Fixed with `<server force>` vars and a guard in `TestCase` that refuses any database not ending in `_test`.
@@ -26,4 +26,4 @@
 - **Frontend agent's own catches:** an invalid Jest config key, and a bundle over the size warning (fixed by splitting vendor chunks).
 
 ## Time spent
-_To be filled in by the developer:_ planning ~__ · building ~__ · testing ~__ · reviewing ~__ · **total ~__**
+planning: 30min · building 1hr · testing 30min · reviewing 15min · **total 2.15hr**
