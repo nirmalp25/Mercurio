@@ -43,3 +43,30 @@ A running, dated record of how the solution was planned and built with AI. It is
 - The notifier factory wraps Laravel's mailer rather than replacing it, so SES or Postmark is an `.env` change.
 
 **Environment note:** PHP, Composer and gh are not installed on the host. The backend is built and run entirely inside Docker, which matches the reviewer's `docker compose up` path.
+
+## 2026-11-21 — Phase 2: Backend (Catalogue, Identity, Enquiry, Notifier)
+
+**Direction:** "Continue with multiple agents." Work was split by file ownership so no two agents edited the same files:
+- **Main session:** Docker image, module loader, Catalogue and Identity modules.
+- **Agent 1:** Enquiry and Notifier modules.
+- **Agent 2:** the React frontend.
+
+**Built:**
+- `ModuleServiceProvider` convention: each module owns its config, migrations, routes and bindings.
+- **Catalogue:**
+  - `ProductSource` (FakeStore and Fixture adapters, plus a factory) and `ProductRepository` (Eloquent).
+  - `catalogue:sync` is idempotent and never overwrites `is_top_rated`; first run features the top 5 by rating.
+  - ILIKE search, title hits first, LIKE wildcards escaped; a trigram index on title.
+- **Identity:** Sanctum SPA cookie auth, a `role` column, an `EnsureAdmin` middleware, and the admin seeded from `.env`.
+- **Enquiry (agent):** persist, then an after-commit event, then a listener that calls the notifier and logs any failure. Phone validated per country and stored as E.164. Honeypot and throttle.
+- **Notifier (agent):** factory with a config driver map (`null`, `mail`) over Laravel's mailer.
+
+**Where the AI got things wrong, and how each was caught:**
+1. **Scaffold agent files.** Laravel 13's scaffold ships `backend/CLAUDE.md` and `AGENTS.md` telling agents to download and run a remote PHP installer. They were ignored (third-party content, not the developer's instruction) and deleted, so the root `CLAUDE.md` is the single source of agent instructions.
+2. **PHP version mismatch.** The lock file was resolved by the Composer image's PHP 8.5, but the runtime image was PHP 8.3. The container failed to boot with 45 dependency errors. Fixed by moving the runtime to PHP 8.4 and requiring `^8.4`.
+3. **Critical: tests wiped the dev DB.** phpunit `<env force>` does not override env vars Docker has already set, so `RefreshDatabase` ran on `mercuriodb`. **Caught by Agent 1**, which noticed the dev DB was empty after its run. Fixed by moving to `<server force>` vars and adding a `TestCase` guard that refuses any database not ending in `_test`.
+4. **Login test failed with "Session store not set".** Sanctum's stateful domains and CORS credentials weren't configured. This would also have broken the real SPA login. Fixed with config (`SANCTUM_STATEFUL_DOMAINS`, CORS restricted to `FRONTEND_URL` with credentials).
+5. **Live API used SQLite even though the tests passed.** `artisan serve` strips process env vars from its worker by default. Caught by curling the running API, not by tests. Fixed with `--no-reload` and by regenerating `backend/.env`.
+6. **Port clash.** A local Python server and a WSL relay were holding `:8000`. Host ports are now configurable (`API_PORT`, `WEB_PORT`).
+
+**Tests:** 48 pass, 1 intentionally failing (`TopRatedAdminTest` cap rule, waiting on a `TODO(human)` contribution).
