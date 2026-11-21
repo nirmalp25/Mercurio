@@ -1,0 +1,62 @@
+{
+  "id": "enquiry",
+  "title": "Enquire about this product",
+  "submitLabel": "Send enquiry",
+  "fields": [
+    {
+      "type": "text",
+      "name": "firstName",
+      "label": "First name",
+      "dataType": "string",
+      "required": true,
+      "placeholder": "Jane",
+      "validation": { "maxLength": 100 },
+      "props": { "autoComplete": "given-name", "width": "half" }
+    },
+    {
+      "type": "text",
+      "name": "lastName",
+      "label": "Last name",
+      "dataType": "string",
+      "required": true,
+      "placeholder": "Doe",
+      "validation": { "maxLength": 100 },
+      "props": { "autoComplete": "family-name", "width": "half" }
+    },
+    {
+      "type": "email",
+      "name": "email",
+      "label": "Email",
+      "dataType": "email",
+      "required": true,
+      "placeholder": "jane@example.com",
+      "validation": { "maxLength": 255 },
+      "props": { "autoComplete": "email" }
+    },
+    {
+      "type": "phone",
+      "name": "phone",
+      "label": "Contact number",
+      "dataType": "phone",
+      "required": true,
+      "placeholder": "98765 43210",
+      "props": { "countryField": "countryCode", "defaultCountry": "IN" }
+    },
+    {
+      "type": "textarea",
+      "name": "query",
+      "label": "Your query",
+      "dataType": "string",
+      "required": true,
+      "placeholder": "What would you like to know?",
+      "validation": { "minLength": 10, "maxLength": 1000 },
+      "props": { "rows": 5 }
+    },
+    {
+      "type": "honeypot",
+      "name": "website",
+      "label": "Website",
+      "dataType": "string"
+    }
+  ]
+}

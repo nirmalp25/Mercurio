@@ -1,0 +1,5 @@
+{
+  "featured": { "id": "featured", "title": "Top rated", "cardType": "productCard" },
+  "categories": { "id": "categories", "title": "Shop by category", "cardType": "categoryCard" },
+  "categoryModal": { "topRatedPreviewCount": 4 }
+}

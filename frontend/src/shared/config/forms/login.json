@@ -1,0 +1,23 @@
+{
+  "id": "login",
+  "title": "Admin sign in",
+  "submitLabel": "Sign in",
+  "fields": [
+    {
+      "type": "email",
+      "name": "email",
+      "label": "Email",
+      "dataType": "email",
+      "required": true,
+      "props": { "autoComplete": "username" }
+    },
+    {
+      "type": "text",
+      "name": "password",
+      "label": "Password",
+      "dataType": "string",
+      "required": true,
+      "props": { "inputType": "password", "autoComplete": "current-password" }
+    }
+  ]
+}

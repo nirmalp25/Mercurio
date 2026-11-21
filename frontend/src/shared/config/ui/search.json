@@ -1,0 +1,7 @@
+{
+  "placeholder": "Search products…",
+  "minChars": 2,
+  "debounceMs": 300,
+  "suggestLimit": 8,
+  "buttonLabel": "Search"
+}
