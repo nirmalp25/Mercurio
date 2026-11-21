@@ -70,3 +70,36 @@ A running, dated record of how the solution was planned and built with AI. It is
 6. **Port clash.** A local Python server and a WSL relay were holding `:8000`. Host ports are now configurable (`API_PORT`, `WEB_PORT`).
 
 **Tests:** 48 pass, 1 intentionally failing (`TopRatedAdminTest` cap rule, waiting on a `TODO(human)` contribution).
+
+## 2026-11-21 — Phase 3: Frontend (Agent 2)
+
+**Built:**
+- Vite + React 18 + TypeScript (strict). Jest + RTL, per the developer's explicit choice of Jest over Vitest.
+- **Config-driven UI:**
+  - The element contract is in `shared/config/schema.ts`; forms and layouts are JSON.
+  - `componentRegistry` maps `type` to a component. All registration lives in `app/registerElements.ts`, so `shared/` never imports feature modules.
+  - Unknown types render a visible fallback instead of crashing.
+  - zod validation is *generated from the same config*, and server 422s map back onto fields.
+- Design tokens in `shared/theme/tokens.css` are the reskin layer for when the creative work lands.
+- **Modules:**
+  - catalogue: home, category modal, product page.
+  - search: 300 ms debounced autocomplete with abort; results only on Search or Enter, per the acceptance criterion.
+  - enquiry: modal, then a SweetAlert thank-you.
+  - admin: lazy-loaded login, top-rated manager, queries.
+- Results: 21 Jest tests, strict typecheck and production build all green.
+
+**Where the AI got things wrong (self-caught):**
+- **Invalid Jest config key.** It wrote `setupFilesAfterEach` alongside `setupFilesAfterEnv`, and removed it before the first run.
+- **Bundle-size warning.** The first build was 590 kB, over the 500 kB warning. Lazy-loading admin wasn't enough because the weight was vendor code; splitting vendor chunks fixed it.
+- **Router warnings.** React Router v7 future-flag warnings were silenced by opting into the flags in both the app and the test router.
+
+## 2026-11-21 — Phase 4: Integration & verification (workflow)
+
+**Direction:** The developer enabled multi-agent orchestration (ultracode).
+
+**Shape:** A single workflow runs three tracks in parallel:
+1. Contract audit: frontend types vs the live API.
+2. Playwright E2E: one spec per acceptance criterion, plus admin.
+3. Four review dimensions (security, backend correctness, frontend correctness, tests and design vs the rubric). Each finding is checked by two independent skeptics told to refute it, and only findings that survive get fixed.
+
+*Why this shape:* AI reviewers produce plausible-but-wrong findings. Making a second agent try to disprove each one filters them out before they cost fix time.
